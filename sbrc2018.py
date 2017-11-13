@@ -159,9 +159,9 @@ def auth(host):
 
 
 def create_result_file(qtd_rules,test_step):
-    httperf = str(qtd_rules) + "-iptables-rules-httperf.csv" + str(test_step)
-    rtt = str(qtd_rules) + "-iptables-rules-rtt.csv" + str(test_step)
-    throughput = str(qtd_rules) + "-iptables-rules-throughput.csv" + str(test_step)
+    httperf = str(qtd_rules) + "-iptables-rules-httperf.csv-" + str(test_step)
+    rtt = str(qtd_rules) + "-iptables-rules-rtt.csv-" + str(test_step)
+    throughput = str(qtd_rules) + "-iptables-rules-throughput.csv-" + str(test_step)
     #test_exec = "/bin/bash 250a20000-iptables-rules-benchmarking.sh %s %s %s" % (httperf, rtt, throughput)
     result = int(subprocess.check_output(["/bin/bash", "250a20000-iptables-rules-benchmarking.sh", httperf, rtt, throughput]))
     if result == 10:
@@ -185,7 +185,7 @@ if __name__ == "__main__":
             #source_ip = raw_input("Please inform traffic generator's ip address. Eg.: 10.224.70.50 \n ")
             #destination_ip = raw_input("Please inform traffic receptor's ip address. Eg.: 10.224.76.198 \n ")
             out = iptables_forward_rules(source_ip, destination_ip, value)
-            import pdb; pdb.set_trace()
+            #import pdb; pdb.set_trace()
             if out == True:
                 print out
                 if create_result_file(qtd_rules,value) == 10:
