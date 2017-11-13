@@ -5,8 +5,9 @@ import sys
 import time
 import os
 import getpass
-from paramiko import SSHClient
-import paramiko
+import subprocess
+#from paramiko import SSHClient
+#import paramiko
 
 def how_many_rules(rules):
     end_ip = ""
@@ -72,7 +73,11 @@ def source_ipRange(start_ip, end_ip):
        ip_range.append(".".join(map(str, temp)))    
     return ip_range
 
- 
+# Standard rules
+# iptables -A INPUT -s 10.127.0.0/16 -j ACCEPT
+# iptables -A FORWARD -s 10.127.0.0/16 -j ACCEPT
+# iptables -A OUTPUT -s 10.127.0.0/16 -j ACCEPT 
+#
 def iptables_forward_rules(source_ip, destination_ip, test_type):
     #import pdb; pdb.set_trace()
     count = 0
@@ -80,43 +85,55 @@ def iptables_forward_rules(source_ip, destination_ip, test_type):
     try:
         if (test_type == "first_rule"):
             print "We are going to create %s iptables rules and the allowing rule is in the first one" % (count_rules)
-            #os.popen("iptables -A FORWARD -s 10.224.70.50/32 -d 10.224.76.198/32 -i eth1 -o eth0 -m comment --comment 'rule %s - allow access between endpoints' -j DROP" % (count))
-            print """iptables -A FORWARD -s %s/32 -d %s/32 -i eth1 -o eth0 -m comment --comment 'rule %s - allow access between endpoints' -j ACCEPT""" % (source_ip, destination_ip, count)
+            os.popen("""iptables-restore < /root/testes/iptables-original""")
+            os.popen("""iptables -A INPUT -s 10.127.0.0/16 -j ACCEPT""")
+            os.popen("""iptables -A OUTPUT -s 10.127.0.0/16 -j ACCEPT""")
+            os.popen("""iptables -A FORWARD -s 10.127.0.0/16 -j ACCEPT""")
+            #print """iptables -A FORWARD -s %s/32 -d %s/32 -i eth1 -o eth0 -m comment --comment 'rule %s - allow access between endpoints' -j ACCEPT""" % (source_ip, destination_ip, count)
+            os.popen("""iptables -A FORWARD -s %s/32 -d %s/32 -i eth1 -o eth0 -m comment --comment 'rule %s - allow access between endpoints' -j ACCEPT""" % (source_ip, destination_ip, count))
             test_type = ""
             for ip in ip_range:
                 count = count + 1
-                print """iptables -A FORWARD -s %s/32 -d %s/32 -i eth1 -o eth0 -m comment --comment 'iptables rule %s --> without match' -j ACCEPT""" % (ip, destination_ip, count)
+                os.popen("""iptables -A FORWARD -s %s/32 -d %s/32 -i eth1 -o eth0 -m comment --comment 'iptables rule %s --> without match' -j ACCEPT""" % (ip, destination_ip, count))
         elif (test_type == "middle_rule"): 
             print "We are going to create %s iptables rules and the allowing rule is in the middle" % (count_rules)
+            os.popen("""iptables-restore < /root/testes/iptables-original""")
+            os.popen("""iptables -A INPUT -s 10.127.0.0/16 -j ACCEPT""")
+            os.popen("""iptables -A OUTPUT -s 10.127.0.0/16 -j ACCEPT""")
+            os.popen("""iptables -A FORWARD -s 10.127.0.0/16 -j ACCEPT""")
             test_type = ""
             for ip in ip_range:
                 if (len(ip_range) % 2 != 0) and (count == len(ip_range) / 2):
                     #os.popen("iptables -A FORWARD -s %s/32 -d 10.224.76.198/32 -i eth1 -o eth0 -m comment --comment 'iptables rule %s --> without match' -j ACCEPT" % (ip,count))
-                    print """iptables -A FORWARD -s %s/32 -d %s/32 -i eth1 -o eth0 -m comment --comment 'rule %s - allow access between endpoints' -j ACCEPT""" % (source_ip, destination_ip, count + 1)                
+                    os.popen("""iptables -A FORWARD -s %s/32 -d %s/32 -i eth1 -o eth0 -m comment --comment 'rule %s - allow access between endpoints' -j ACCEPT""" % (source_ip, destination_ip, count + 1)) 
                     count = count + 1
                 elif (len(ip_range) % 2 == 0) and (count == len(ip_range) / 2):
                     #os.popen("iptables -A FORWARD -s %s/32 -d 10.224.76.198/32 -i eth1 -o eth0 -m comment --comment 'iptables rule %s --> without match' -j ACCEPT" % (ip,count))
-                    print """iptables -A FORWARD -s %s/32 -d %s/32 -i eth1 -o eth0 -m comment --comment 'rule %s - allow access between endpoints' -j ACCEPT""" % (source_ip, destination_ip, count + 1)                
+                    os.popen("""iptables -A FORWARD -s %s/32 -d %s/32 -i eth1 -o eth0 -m comment --comment 'rule %s - allow access between endpoints' -j ACCEPT""" % (source_ip, destination_ip, count + 1)) 
                     count = count + 1
                 else:
-                    print """iptables -A FORWARD -s %s/32 -d %s/32 -i eth1 -o eth0 -m comment --comment 'iptables rule %s --> without match' -j ACCEPT""" % (ip, destination_ip, count)
+                    os.popen("""iptables -A FORWARD -s %s/32 -d %s/32 -i eth1 -o eth0 -m comment --comment 'iptables rule %s --> without match' -j ACCEPT""" % (ip, destination_ip, count))
                     count = count + 1
         elif (test_type == "last_one_rule"):
             print "We are going to create %s iptables rules and the allowing rule is the last one" % (count_rules)
+            os.popen("""iptables-restore < /root/testes/iptables-original""")
+            os.popen("""iptables -A INPUT -s 10.127.0.0/16 -j ACCEPT""")
+            os.popen("""iptables -A OUTPUT -s 10.127.0.0/16 -j ACCEPT""")
+            os.popen("""iptables -A FORWARD -s 10.127.0.0/16 -j ACCEPT""")
             test_type = ""
             for ip in ip_range:
                 if (count == len(ip_range) - 1):
-                    print """iptables -A FORWARD -s %s/32 -d %s/32 -i eth1 -o eth0 -m comment --comment 'iptables rule %s --> without match' -j ACCEPT""" % (ip, destination_ip, count)
-                    print """iptables -A FORWARD -s %s/32 -d %s/32 -i eth1 -o eth0 -m comment --comment 'rule %s - allow access between endpoints' -j ACCEPT""" % (source_ip, destination_ip, count + 1)
+                    os.popen("""iptables -A FORWARD -s %s/32 -d %s/32 -i eth1 -o eth0 -m comment --comment 'iptables rule %s --> without match' -j ACCEPT""" % (ip, destination_ip, count))
+                    os.popen("""iptables -A FORWARD -s %s/32 -d %s/32 -i eth1 -o eth0 -m comment --comment 'rule %s - allow access between endpoints' -j ACCEPT""" % (source_ip, destination_ip, count + 1))
                     break
                 else:
-                    print """iptables -A FORWARD -s %s/32 -d %s/32 -i eth1 -o eth0 -m comment --comment 'iptables rule %s --> without match' -j ACCEPT""" % (ip, destination_ip, count)
+                    os.popen("""iptables -A FORWARD -s %s/32 -d %s/32 -i eth1 -o eth0 -m comment --comment 'iptables rule %s --> without match' -j ACCEPT""" % (ip, destination_ip, count))
                     count = count + 1              
         else:
             print """You need to choose first_rule, middle_rule or last_one_rule"""
     except Exception:
         sys.exit("something went wrong") 
-    return 
+    return True
 
 
 
@@ -141,23 +158,20 @@ def auth(host):
     sys.exit("Authentication failed. Please verify your credentials.\n")
 
 
-def create_result_file(qtd_rules):
-    httperf = str(qtd_rules) + "-iptables-rules-httperf.csv"
-    rtt = str(qtd_rules) + "-iptables-rules-rtt.csv"
-    throughput = str(qtd_rules) + "-iptables-rules-throughput.csv"
-    test_exec = "/bin/bash 250a20000-iptables-rules-benchmarking.sh %s %s %s" % (httperf, rtt, throughput)
-    os.system(test_exec)
-    if stderr.channel.recv_exit_status() != 0:
-        print stderr.read()
-    else:
-        result = stdout.read()
+def create_result_file(qtd_rules,test_step):
+    httperf = str(qtd_rules) + "-iptables-rules-httperf.csv" + str(test_step)
+    rtt = str(qtd_rules) + "-iptables-rules-rtt.csv" + str(test_step)
+    throughput = str(qtd_rules) + "-iptables-rules-throughput.csv" + str(test_step)
+    #test_exec = "/bin/bash 250a20000-iptables-rules-benchmarking.sh %s %s %s" % (httperf, rtt, throughput)
+    result = int(subprocess.check_output(["/bin/bash", "250a20000-iptables-rules-benchmarking.sh", httperf, rtt, throughput]))
+    if result == 10:
         return result
-
+    else:
+        print "Create result file ERROR"
 
 
 
 if __name__ == "__main__":
-    import pdb; pdb.set_trace()
     #rules = int(raw_input("How many rules do you wanna create? "))
     test_step = [250, 500, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000, 11000, 12000, 13000, 14000, 15000, 16000, 17000, 18000, 19000, 20000]
     test_type = ["first_rule", "middle_rule", "last_one_rule"]
@@ -170,9 +184,13 @@ if __name__ == "__main__":
             ip_range = source_ipRange("10.0.0.0", end_ip)
             #source_ip = raw_input("Please inform traffic generator's ip address. Eg.: 10.224.70.50 \n ")
             #destination_ip = raw_input("Please inform traffic receptor's ip address. Eg.: 10.224.76.198 \n ")
-            iptables_forward_rules(source_ip, destination_ip, value)
-            time.sleep(5)
-            if create_result_file(qtd_rules) == 10:
-                continue
+            out = iptables_forward_rules(source_ip, destination_ip, value)
+            import pdb; pdb.set_trace()
+            if out == True:
+                print out
+                if create_result_file(qtd_rules,value) == 10:
+                    continue
+            else:            
+                print "Main ERROR"
 
 	
