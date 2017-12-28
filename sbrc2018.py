@@ -10,11 +10,8 @@ import subprocess
 #import paramiko
 
 
-test_step = [250, 20000, 500, 19000]
-#test_step = [250, 20000, 500, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000, 11000, 12000, 13000, 14000, 15000, 16000, 17000, 18000, 19000]
-#test_step = [10000, 11000, 12000, 13000, 14000, 15000, 16000, 17000, 18000, 19000, 20000]
+test_step = [250, 500, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000, 11000, 12000, 13000, 14000, 15000, 16000, 17000, 18000, 19000, 20000]
 test_type = ["first_rule", "middle_rule", "last_one_rule"]
-#test_type = ["last_one_rule"]
 source_ip = "10.170.3.227"
 destination_ip = "10.170.3.245"
 count = 0
@@ -245,14 +242,13 @@ def create_iptables_files():
 
 if __name__ == "__main__":
     #while count_exec <= 66:
-#    import pdb; pdb.set_trace()
-    #while count_exec <= 12:
-    #    if create_iptables_files() < 12:
+    #    if create_iptables_files() < 66:
     #        print "Could not create all iptables rules files. Something went wrong." 
     #        break
-        #else:
-            #rules = int(raw_input("How many rules do you wanna create? "))
+    #    else:
+    #        rules = int(raw_input("How many rules do you wanna create? "))
     try:
+        #import pdb; pdb.set_trace()
         exec_iptables_bench()
     except Exception:
         print "ERROR"	
